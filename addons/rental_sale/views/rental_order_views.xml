@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rental_order_view_form_inherit_sale" model="ir.ui.view">
+        <field name="name">rental.order.view.form.inherit.sale</field>
+        <field name="model">rental.order</field>
+        <field name="inherit_id" ref="rental_core.rental_order_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Header button -->
+            <xpath expr="//header" position="inside">
+                <button name="action_create_invoice"
+                        string="Create Invoice"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state != 'returned' or invoice_count &gt; 0"/>
+            </xpath>
+
+            <!-- Stat button in button box -->
+            <xpath expr="//div[hasclass('oe_title')]" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_invoices"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-pencil-square-o"
+                            invisible="invoice_count == 0">
+                        <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                    </button>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

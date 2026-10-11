@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Public Equipment Catalog Page -->
+    <template id="rental_catalog_page" name="Equipment Rental Catalog">
+        <t t-call="portal.frontend_layout">
+            <div class="container my-5">
+                <div class="row mb-4 align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="fw-bold text-primary">Equipment Rental Catalog</h1>
+                        <p class="text-muted lead mb-0">Browse our professional tools and heavy equipment available for immediate rental.</p>
+                    </div>
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <a href="/rental/book" class="btn btn-primary btn-lg shadow-sm">
+                            <i class="fa fa-calendar-check-o me-2"/> Book Online Now
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Category Filter Pills -->
+                <div class="d-flex flex-wrap gap-2 mb-4 pb-2 border-bottom">
+                    <a href="/rental" t-attf-class="btn btn-sm #{'btn-primary' if not current_category else 'btn-outline-secondary'}">
+                        All Categories
+                    </a>
+                    <t t-foreach="categories" t-as="cat">
+                        <a t-attf-href="/rental?category_id=#{cat.id}"
+                           t-attf-class="btn btn-sm #{'btn-primary' if current_category == cat.id else 'btn-outline-secondary'}">
+                            <span t-field="cat.name"/>
+                        </a>
+                    </t>
+                </div>
+
+                <!-- Equipment Grid -->
+                <div t-if="not equipments" class="alert alert-warning py-4 text-center">
+                    <h4>No equipment currently available in this category.</h4>
+                    <p class="mb-0">Please check back soon or <a href="/rental">browse all equipment</a>.</p>
+                </div>
+
+                <div class="row g-4" t-if="equipments">
+                    <t t-foreach="equipments" t-as="eq">
+                        <div class="col-12 col-sm-6 col-lg-4">
+                            <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+                                <div style="height: 220px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                    <img t-if="eq.image"
+                                         t-attf-src="/web/image/rental.equipment/#{eq.id}/image"
+                                         class="card-img-top w-100 h-100 object-fit-cover"
+                                         t-att-alt="eq.name"/>
+                                    <div t-if="not eq.image" class="text-muted text-center p-4">
+                                        <i class="fa fa-wrench fa-4x text-black-50 mb-2"/><br/>
+                                        <small>No image available</small>
+                                    </div>
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title fw-bold text-dark mb-0" t-field="eq.name"/>
+                                        <span class="badge text-bg-success">Available</span>
+                                    </div>
+                                    <div class="text-muted small mb-2">
+                                        <span class="badge text-bg-light border me-1" t-field="eq.code"/>
+                                        <span t-field="eq.category_id.name"/>
+                                    </div>
+                                    <p class="card-text text-muted small flex-grow-1" t-field="eq.notes"/>
+                                    <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
+                                        <div>
+                                            <span class="fs-4 fw-bold text-primary" t-field="eq.daily_price" t-options='{"widget": "monetary", "display_currency": eq.currency_id}'/>
+                                            <span class="text-muted small"> / day</span>
+                                        </div>
+                                        <a t-attf-href="/rental/book?equipment_id=#{eq.id}" class="btn btn-outline-primary btn-sm px-3">
+                                            Reserve
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Public Booking Page -->
+    <template id="rental_book_page" name="Book Equipment Rental">
+        <t t-call="portal.frontend_layout">
+            <div class="container my-5" style="max-width: 720px;">
+                <div class="card shadow border-0 rounded-3">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h3 class="card-title fw-bold mb-0">Equipment Rental Booking</h3>
+                        <p class="mb-0 text-white-50 small">Submit your booking request and our team will prepare your rental order.</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <div t-if="error" class="alert alert-danger" role="alert">
+                            <t t-esc="error"/>
+                        </div>
+
+                        <form action="/rental/book" method="post">
+                            <h5 class="fw-bold text-secondary mb-3">1. Select Equipment</h5>
+                            <div class="mb-3">
+                                <label for="equipment_id" class="form-label fw-semibold">Equipment <span class="text-danger">*</span></label>
+                                <select class="form-select form-select-lg" id="equipment_id" name="equipment_id" required="required">
+                                    <option value="">-- Choose Equipment --</option>
+                                    <t t-foreach="equipments" t-as="eq">
+                                        <option t-att-value="eq.id" t-att-selected="eq.id == preselected_id">
+                                            <t t-esc="eq.name"/> (<t t-esc="eq.code"/>) — <t t-esc="eq.daily_price"/> <t t-esc="eq.currency_id.name"/>/day
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label for="date_start" class="form-label fw-semibold">Start Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="date_start" name="date_start"
+                                           t-att-value="post.get('date_start') or default_start" required="required"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="date_end" class="form-label fw-semibold">End Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="date_end" name="date_end"
+                                           t-att-value="post.get('date_end') or default_end" required="required"/>
+                                </div>
+                            </div>
+
+                            <h5 class="fw-bold text-secondary mb-3 pt-3 border-top">2. Your Contact Information</h5>
+                            <div class="mb-3">
+                                <label for="name" class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name"
+                                       t-att-value="post.get('name') or (env.user.partner_id.name if env.user and env.user.partner_id.name != 'Public user' else '')"
+                                       placeholder="e.g. Jane Doe" required="required"/>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="email" name="email"
+                                           t-att-value="post.get('email') or (env.user.partner_id.email if env.user else '')"
+                                           placeholder="e.g. jane@example.com" required="required"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="phone" class="form-label fw-semibold">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone"
+                                           t-att-value="post.get('phone') or (env.user.partner_id.phone if env.user else '')"
+                                           placeholder="e.g. +1 555-0199"/>
+                                </div>
+                            </div>
+
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                                    <i class="fa fa-check-circle me-1"/> Confirm Booking Request
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Booking Confirmation Success Page -->
+    <template id="rental_book_confirmation" name="Booking Confirmed">
+        <t t-call="portal.frontend_layout">
+            <div class="container my-5 text-center" style="max-width: 600px;">
+                <div class="card shadow border-0 p-5 rounded-3">
+                    <div class="mb-4 text-success">
+                        <i class="fa fa-check-circle-o fa-5x"/>
+                    </div>
+                    <h2 class="fw-bold text-success mb-2">Booking Request Received!</h2>
+                    <p class="text-muted lead">Thank you. Your rental reservation has been recorded.</p>
+                    
+                    <div class="bg-light p-3 rounded text-start mb-4 border">
+                        <div class="mb-2"><strong>Order Reference: </strong> <span class="badge text-bg-primary fs-6" t-field="order.name"/></div>
+                        <div class="mb-2"><strong>Equipment: </strong> <span t-field="equipment.name"/> (<span t-field="equipment.code"/>)</div>
+                        <div class="mb-2"><strong>Rental Period: </strong> <span t-field="order.date_start"/> &#8594; <span t-field="order.date_end"/> (<span t-field="order.days"/> days)</div>
+                        <div><strong>Estimated Total: </strong> <span class="fw-bold text-success" t-field="order.total" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/></div>
+                    </div>
+
+                    <p class="small text-muted mb-4">Our team will review your booking and send confirmation details to your email shortly.</p>
+
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="/rental" class="btn btn-outline-secondary">Browse More</a>
+                        <a href="/my/rentals" class="btn btn-primary">View My Rentals</a>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

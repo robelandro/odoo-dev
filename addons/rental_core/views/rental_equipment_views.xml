@@ -1,0 +1,134 @@
+<odoo>
+    <!-- List View -->
+    <record id="rental_equipment_view_list" model="ir.ui.view">
+        <field name="name">rental.equipment.view.list</field>
+        <field name="model">rental.equipment</field>
+        <field name="arch" type="xml">
+            <list string="Equipment">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="category_id"/>
+                <field name="daily_price"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'available'"
+                       decoration-warning="state == 'rented'"
+                       decoration-danger="state == 'maintenance'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="rental_equipment_view_kanban" model="ir.ui.view">
+        <field name="name">rental.equipment.view.kanban</field>
+        <field name="model">rental.equipment</field>
+        <field name="arch" type="xml">
+            <kanban sample="1">
+                <field name="currency_id"/>
+                <templates>
+                    <t t-name="card" class="flex-row">
+                        <aside class="d-flex align-items-center me-2">
+                            <field name="image" widget="image" options="{'img_class': 'object-fit-cover'}"/>
+                        </aside>
+                        <main>
+                            <div class="fw-bold fs-5">
+                                <field name="name"/>
+                            </div>
+                            <div class="text-muted small">
+                                <field name="code"/>
+                            </div>
+                            <div class="small">
+                                <field name="category_id"/>
+                            </div>
+                            <div class="mt-1 d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-primary">
+                                    <field name="daily_price"/> / day
+                                </span>
+                                <field name="state" widget="badge"
+                                       decoration-success="state == 'available'"
+                                       decoration-warning="state == 'rented'"
+                                       decoration-danger="state == 'maintenance'"/>
+                            </div>
+                        </main>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="rental_equipment_view_form" model="ir.ui.view">
+        <field name="name">rental.equipment.view.form</field>
+        <field name="model">rental.equipment</field>
+        <field name="arch" type="xml">
+            <form string="Equipment">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="available,rented,maintenance"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_rentals"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-retweet">
+                            <field name="rental_count" widget="statinfo" string="Rentals"/>
+                        </button>
+                    </div>
+                    <field name="image" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Hammer Drill"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="category_id"/>
+                        </group>
+                        <group>
+                            <field name="daily_price"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Equipment specifications, maintenance guidelines, or operational notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="rental_equipment_view_search" model="ir.ui.view">
+        <field name="name">rental.equipment.view.search</field>
+        <field name="model">rental.equipment</field>
+        <field name="arch" type="xml">
+            <search string="Search Equipment">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="category_id"/>
+                <separator/>
+                <filter string="Available" name="available" domain="[('state', '=', 'available')]"/>
+                <filter string="Rented" name="rented" domain="[('state', '=', 'rented')]"/>
+                <filter string="In Maintenance" name="maintenance" domain="[('state', '=', 'maintenance')]"/>
+                <group>
+                    <filter string="Category" name="group_by_category" context="{'group_by': 'category_id'}"/>
+                    <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action Window -->
+    <record id="rental_equipment_action" model="ir.actions.act_window">
+        <field name="name">Equipment</field>
+        <field name="res_model">rental.equipment</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="rental_equipment_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Register your first piece of rental equipment!
+            </p>
+        </field>
+    </record>
+</odoo>

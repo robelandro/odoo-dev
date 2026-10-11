@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Portal Home Entry -->
+    <template id="portal_my_home_rental" name="Show Rentals" customize_show="True" inherit_id="portal.portal_my_home" priority="40">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Rentals</t>
+                <t t-set="url" t-value="'/my/rentals'"/>
+                <t t-set="placeholder_count" t-value="'rental_count'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Portal My Rentals List Page -->
+    <template id="portal_my_rentals" name="My Rental Orders">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">My Equipment Rentals</t>
+            </t>
+
+            <div t-if="not orders" class="alert alert-info mt-3" role="alert">
+                You currently have no equipment rental orders. Explore our <a href="/rental" class="alert-link">Rental Catalog</a> to book equipment!
+            </div>
+
+            <div t-if="orders" class="table-responsive mt-3">
+                <table class="table table-hover bg-white border rounded shadow-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Order</th>
+                            <th>Rental Period</th>
+                            <th>Duration</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="orders" t-as="order">
+                            <td>
+                                <strong t-field="order.name"/>
+                            </td>
+                            <td>
+                                <span t-field="order.date_start"/> &#8594; <span t-field="order.date_end"/>
+                            </td>
+                            <td>
+                                <span t-field="order.days"/> Days
+                            </td>
+                            <td>
+                                <strong t-field="order.total" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/>
+                            </td>
+                            <td>
+                                <span t-if="order.state == 'draft'" class="badge text-bg-secondary">Draft</span>
+                                <span t-elif="order.state == 'confirmed'" class="badge text-bg-primary">Confirmed</span>
+                                <span t-elif="order.state == 'rented'" class="badge text-bg-warning">Active Rental</span>
+                                <span t-elif="order.state == 'returned'" class="badge text-bg-success">Returned</span>
+                                <span t-elif="order.state == 'overdue'" class="badge text-bg-danger">Overdue</span>
+                                <span t-elif="order.state == 'cancelled'" class="badge text-bg-dark">Cancelled</span>
+                            </td>
+                            <td class="text-end">
+                                <a t-if="order.state in ['confirmed', 'rented', 'returned', 'overdue']"
+                                   t-attf-href="/my/rentals/#{order.id}/contract"
+                                   class="btn btn-sm btn-outline-primary"
+                                   title="Download Contract PDF">
+                                    <i class="fa fa-download me-1"/> Contract PDF
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+</odoo>

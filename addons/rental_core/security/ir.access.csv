@@ -1,0 +1,13 @@
+id,name,model_id,group_id/id,operation,domain
+access_rental_category_user,rental.category.user,rental.category,rental_core.group_rental_user,cru,
+access_rental_category_manager,rental.category.manager,rental.category,rental_core.group_rental_manager,crud,
+access_rental_equipment_user,rental.equipment.user,rental.equipment,rental_core.group_rental_user,cru,
+access_rental_equipment_manager,rental.equipment.manager,rental.equipment,rental_core.group_rental_manager,crud,
+access_rental_order_user,rental.order.user,rental.order,rental_core.group_rental_user,cru,
+access_rental_order_manager,rental.order.manager,rental.order,rental_core.group_rental_manager,crud,
+access_rental_order_line_user,rental.order.line.user,rental.order.line,rental_core.group_rental_user,cru,
+access_rental_order_line_manager,rental.order.line.manager,rental.order.line,rental_core.group_rental_manager,crud,
+access_rental_maintenance_user,rental.maintenance.user,rental.maintenance,rental_core.group_rental_user,cru,
+access_rental_maintenance_manager,rental.maintenance.manager,rental.maintenance,rental_core.group_rental_manager,crud,
+access_rental_return_wizard_user,rental.return.wizard.user,rental.return.wizard,rental_core.group_rental_user,crud,
+access_rental_return_wizard_manager,rental.return.wizard.manager,rental.return.wizard,rental_core.group_rental_manager,crud,

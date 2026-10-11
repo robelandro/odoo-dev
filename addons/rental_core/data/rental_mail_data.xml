@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Mailpit Outgoing Mail Server -->
+        <record id="mail_server_mailpit" model="ir.mail_server">
+            <field name="name">Mailpit Local SMTP</field>
+            <field name="smtp_host">mailpit</field>
+            <field name="smtp_port">1025</field>
+            <field name="smtp_encryption">none</field>
+            <field name="sequence">1</field>
+        </record>
+
+        <!-- Template: Rental Order Confirmation -->
+        <record id="mail_template_rental_confirmation" model="mail.template">
+            <field name="name">Rental: Order Confirmation</field>
+            <field name="model_id" ref="rental_core.model_rental_order"/>
+            <field name="subject">{{ object.company_id.name }} Rental Confirmation - {{ object.name }}</field>
+            <field name="email_from">{{ (object.user_id.email_formatted or object.company_id.email_formatted or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.customer_id.id }}</field>
+            <field name="description">Sent to customer when rental order is confirmed with PDF contract attached</field>
+            <field name="report_template_ids" eval="[(4, ref('rental_core.action_report_rental_contract'))]"/>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-family: 'Lucida Grande', Helvetica, Arial, sans-serif; font-size: 13px; color: #333333;">
+                    <p style="margin: 0 0 16px;">
+                        Dear <strong t-out="object.customer_id.name or 'Valued Customer'"/>,
+                    </p>
+                    <p style="margin: 0 0 16px;">
+                        Your rental order <strong t-out="object.name or ''"/> has been successfully <strong>confirmed</strong>.
+                    </p>
+                    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 16px; margin-bottom: 20px;">
+                        <h4 style="margin-top: 0; color: #0d6efd;">Rental Summary</h4>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                            <tr>
+                                <td style="padding: 4px 0; width: 140px;"><strong>Start Date:</strong></td>
+                                <td style="padding: 4px 0;"><span t-out="object.date_start"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 4px 0;"><strong>End Date:</strong></td>
+                                <td style="padding: 4px 0;"><span t-out="object.date_end"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 4px 0;"><strong>Rental Duration:</strong></td>
+                                <td style="padding: 4px 0;"><span t-out="object.days"/> Days</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 4px 0;"><strong>Total Amount:</strong></td>
+                                <td style="padding: 4px 0; font-weight: bold; color: #198754;">
+                                    <span t-out="object.total"/> <span t-out="object.currency_id.name"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <p style="margin: 0 0 16px;">
+                        Your formal <strong>Rental Contract</strong> is attached to this email for your records and signature.
+                    </p>
+                    <p style="margin: 0 0 16px;">
+                        Please feel free to contact us if you have any questions or require extensions.
+                    </p>
+                    <p style="margin: 0; color: #6c757d;">
+                        Best regards,<br/>
+                        <span t-out="object.company_id.name or 'Equipment Rentals Team'"/>
+                    </p>
+                </div>
+            </field>
+        </record>
+
+        <!-- Template: Return Due Tomorrow Reminder -->
+        <record id="mail_template_rental_due_reminder" model="mail.template">
+            <field name="name">Rental: Return Due Tomorrow</field>
+            <field name="model_id" ref="rental_core.model_rental_order"/>
+            <field name="subject">Reminder: Equipment Return Due Tomorrow - {{ object.name }}</field>
+            <field name="email_from">{{ (object.user_id.email_formatted or object.company_id.email_formatted or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.customer_id.id }}</field>
+            <field name="description">Sent to customer one day before rental ends</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-family: 'Lucida Grande', Helvetica, Arial, sans-serif; font-size: 13px; color: #333333;">
+                    <p style="margin: 0 0 16px;">
+                        Dear <strong t-out="object.customer_id.name or 'Valued Customer'"/>,
+                    </p>
+                    <p style="margin: 0 0 16px;">
+                        This is a friendly reminder that your equipment rental order <strong t-out="object.name or ''"/> is scheduled for return <strong>tomorrow, <span t-out="object.date_end"/></strong>.
+                    </p>
+                    <div style="background-color: #fff3cd; border: 1px solid #ffe69c; border-radius: 6px; padding: 16px; margin-bottom: 20px;">
+                        <h4 style="margin-top: 0; color: #664d03;">Return Instructions</h4>
+                        <p style="margin: 0 0 8px;">Please ensure all rented equipment and accessories are packed and ready for return in clean working order.</p>
+                        <p style="margin: 0;">If you require an extension, please reach out to us today to check availability and prevent overdue fees.</p>
+                    </div>
+                    <p style="margin: 0; color: #6c757d;">
+                        Thank you for choosing us!<br/>
+                        <span t-out="object.company_id.name or 'Equipment Rentals Team'"/>
+                    </p>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

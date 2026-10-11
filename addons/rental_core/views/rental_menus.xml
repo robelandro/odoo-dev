@@ -1,0 +1,49 @@
+<odoo>
+    <!-- Top menu -->
+    <menuitem id="rental_menu_root"
+              name="Rentals"
+              sequence="20"
+              groups="rental_core.group_rental_user"/>
+
+    <!-- Orders Menu -->
+    <menuitem id="rental_menu_orders"
+              name="Orders"
+              parent="rental_core.rental_menu_root"
+              action="rental_order_action"
+              sequence="10"/>
+
+    <!-- Equipment Menu -->
+    <menuitem id="rental_menu_equipment"
+              name="Equipment"
+              parent="rental_core.rental_menu_root"
+              action="rental_equipment_action"
+              sequence="20"/>
+
+    <!-- Maintenance Menu -->
+    <menuitem id="rental_menu_maintenance"
+              name="Maintenance"
+              parent="rental_core.rental_menu_root"
+              action="rental_maintenance_action"
+              sequence="30"/>
+
+    <!-- Reporting Menu -->
+    <menuitem id="rental_menu_reporting"
+              name="Reporting"
+              parent="rental_core.rental_menu_root"
+              action="rental_order_report_action"
+              sequence="40"
+              groups="rental_core.group_rental_user"/>
+
+    <!-- Configuration Menu -->
+    <menuitem id="rental_menu_config"
+              name="Configuration"
+              parent="rental_core.rental_menu_root"
+              sequence="100"
+              groups="rental_core.group_rental_manager"/>
+
+    <menuitem id="rental_menu_category"
+              name="Categories"
+              parent="rental_core.rental_menu_config"
+              action="rental_category_action"
+              sequence="10"/>
+</odoo>

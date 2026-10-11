@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report Action -->
+    <record id="action_report_rental_contract" model="ir.actions.report">
+        <field name="name">Rental Contract</field>
+        <field name="model">rental.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">rental_core.report_rental_contract</field>
+        <field name="print_report_name">'Rental Contract - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="rental_core.model_rental_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Main Wrapper Template -->
+    <template id="report_rental_contract">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="rental_core.report_rental_contract_document"/>
+            </t>
+        </t>
+    </template>
+
+    <!-- Document Layout Template -->
+    <template id="report_rental_contract_document">
+        <t t-call="web.external_layout">
+            <div class="page">
+                <div class="row mb-4">
+                    <div class="col-7">
+                        <h2 class="fw-bold text-primary">Rental Agreement &amp; Contract</h2>
+                        <h4 class="text-muted"><span t-field="doc.name"/></h4>
+                    </div>
+                    <div class="col-5 text-end">
+                        <div class="mb-1">
+                            <strong>Status: </strong>
+                            <span class="badge text-bg-primary text-uppercase" t-field="doc.state"/>
+                        </div>
+                        <div>
+                            <strong>Order Date: </strong>
+                            <span t-field="doc.create_date" t-options='{"widget": "date"}'/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer & Rental Details Card -->
+                <div class="row mb-4 p-3 bg-light rounded border">
+                    <div class="col-6">
+                        <h6 class="fw-bold text-secondary text-uppercase mb-2">Renter Information</h6>
+                        <div t-field="doc.customer_id" t-options='{"widget": "contact", "fields": ["name", "address", "phone", "email"]}'/>
+                    </div>
+                    <div class="col-6">
+                        <h6 class="fw-bold text-secondary text-uppercase mb-2">Rental Period</h6>
+                        <table class="table table-sm table-borderless mb-0">
+                            <tr>
+                                <td class="ps-0"><strong>Start Date:</strong></td>
+                                <td><span t-field="doc.date_start"/></td>
+                            </tr>
+                            <tr>
+                                <td class="ps-0"><strong>End Date:</strong></td>
+                                <td><span t-field="doc.date_end"/></td>
+                            </tr>
+                            <tr>
+                                <td class="ps-0"><strong>Duration:</strong></td>
+                                <td><span t-field="doc.days"/> Days</td>
+                            </tr>
+                            <tr t-if="doc.user_id">
+                                <td class="ps-0"><strong>Staff Contact:</strong></td>
+                                <td><span t-field="doc.user_id.name"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Equipment Table -->
+                <h5 class="fw-bold mb-2">Reserved Equipment</h5>
+                <table class="table table-bordered table-sm mb-4">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Item Description</th>
+                            <th>Code</th>
+                            <th>Category</th>
+                            <th class="text-end">Daily Rate</th>
+                            <th class="text-end">Days</th>
+                            <th class="text-end">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="doc.line_ids" t-as="line">
+                            <td><span t-field="line.equipment_id.name"/></td>
+                            <td><span t-field="line.equipment_id.code"/></td>
+                            <td><span t-field="line.equipment_id.category_id.name"/></td>
+                            <td class="text-end"><span t-field="line.daily_price" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                            <td class="text-end"><span t-field="line.days"/></td>
+                            <td class="text-end fw-bold"><span t-field="line.subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Totals Section -->
+                <div class="row mb-4">
+                    <div class="col-7">
+                        <div class="p-2 border rounded bg-light text-muted small">
+                            Payment terms: Due upon return or invoice generation. Prices in <span t-field="doc.currency_id.name"/>.
+                        </div>
+                    </div>
+                    <div class="col-5">
+                        <table class="table table-sm table-borderless">
+                            <tr class="border-top border-bottom fs-5 fw-bold text-end">
+                                <td>Total Rental:</td>
+                                <td><span t-field="doc.total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-secondary text-uppercase">Contract Terms &amp; Conditions</h6>
+                    <ol class="small text-muted ps-3 mb-0">
+                        <li>The Renter agrees to inspect equipment upon receiving and report any existing defects immediately.</li>
+                        <li>Equipment must be returned in good working condition on or before the agreed End Date.</li>
+                        <li>Late returns will be billed at regular daily rates. Damaged or lost items are subject to full repair or replacement fees.</li>
+                        <li>The Renter assumes full operational responsibility and safety liability during the entire rental period.</li>
+                    </ol>
+                </div>
+
+                <!-- Signatures -->
+                <div class="row mt-5 pt-4">
+                    <div class="col-6 text-center">
+                        <div style="border-top: 1px solid #333; width: 80%; margin: auto; padding-top: 6px;">
+                            <strong>Customer Signature</strong><br/>
+                            <span class="small text-muted" t-field="doc.customer_id.name"/>
+                        </div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div style="border-top: 1px solid #333; width: 80%; margin: auto; padding-top: 6px;">
+                            <strong>Authorized Representative</strong><br/>
+                            <span class="small text-muted" t-field="doc.user_id.name"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

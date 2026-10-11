@@ -1,0 +1,33 @@
+<odoo>
+    <record id="rental_return_wizard_view_form" model="ir.ui.view">
+        <field name="name">rental.return.wizard.view.form</field>
+        <field name="model">rental.return.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Return Equipment">
+                <sheet>
+                    <group>
+                        <field name="order_id" readonly="1"/>
+                        <field name="damaged"/>
+                        <field name="notes" placeholder="Describe condition, issues, or repair instructions..."/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm_return"
+                            string="Confirm Return"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="rental_return_wizard_action" model="ir.actions.act_window">
+        <field name="name">Return Equipment</field>
+        <field name="res_model">rental.return.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>
